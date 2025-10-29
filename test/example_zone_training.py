@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 """Example of training drones with custom obstacle zones."""
 
+import sys
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).parent.parent))
 from src.config import GridSettings, ObstacleZone, DEFAULT_LEARNING
 from src.trainer import DroneTrainer
 from src.binary_trainer import BinaryObstacleDroneTrainer

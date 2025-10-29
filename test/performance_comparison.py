@@ -1,12 +1,16 @@
 #!/usr/bin/env python3
 """Performance comparison between Simple and Binary Obstacle drones."""
 
+import sys
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
 import time
 import random
 from typing import List, Dict, Tuple
 import matplotlib.pyplot as plt
 
-from src.config import DEFAULT_GRID, DEFAULT_LEARNING, DEFAULT_SIMULATION, DEFAULT_BINARY_OBSTACLE_SIMULATION
+from src.config import DEFAULT_GRID, DEFAULT_LEARNING, DEFAULT_SIMULATION
 from src.grid import GridWorld
 from src.drone import QLearningDrone, BinaryObstacleDrone
 
@@ -124,7 +128,7 @@ def run_comparison(episodes: int = None) -> Tuple[PerformanceMetrics, Performanc
 
     # Use configuration-based episode counts proportionate to state space
     simple_episodes = DEFAULT_SIMULATION.max_episodes if episodes is None else episodes
-    binary_episodes = DEFAULT_BINARY_OBSTACLE_SIMULATION.max_episodes if episodes is None else int(episodes * 16)  # 16x state space
+    binary_episodes = DEFAULT_SIMULATION.max_episodes if episodes is None else int(episodes * 16)  # 16x state space
 
     print(f"Training with proportionate episodes based on state space:")
     print(f"  Simple Drone: {simple_episodes} episodes (state space: rows × cols = {DEFAULT_GRID.rows}×{DEFAULT_GRID.cols})")

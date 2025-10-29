@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 """Test script for sub-grid obstacle generation."""
 
+import sys
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).parent.parent))
 from src.config import (
     GridSettings, ObstacleZone,
     OBSTACLE_ZONES_CENTER_CLUSTER,

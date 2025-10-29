@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 """Focused test on obstacle-dense environments where binary drone should excel."""
 
+import sys
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).parent.parent))
 from src.grid import GridWorld
 from src.drone import QLearningDrone, BinaryObstacleDrone
 from src.config import GridSettings, LearningSettings

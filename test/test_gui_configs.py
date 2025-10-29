@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 """Test script to demonstrate the obstacle configuration switcher functionality."""
 
+import sys
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).parent.parent))
 from src.config import OBSTACLE_CONFIGS
 from src.binary_trainer import BinaryObstacleDroneTrainer
 
