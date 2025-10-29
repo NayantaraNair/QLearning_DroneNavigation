@@ -6,10 +6,8 @@ from tkinter import ttk
 from typing import Dict, Iterable, List, Tuple
 
 from src.config import (
-    DEFAULT_BINARY_OBSTACLE_SIMULATION, DEFAULT_GRID, GridPoint, BinaryObstacleState, GridSettings,
-    OBSTACLE_ZONES_CENTER_CLUSTER, OBSTACLE_ZONES_RIGHT_SIDE, OBSTACLE_ZONES_PATH_BLOCKER, OBSTACLE_ZONES_SPARSE_CORNERS, OBSTACLE_ZONES_COOL_NEW,
-    ENHANCED_LEARNING, ENHANCED_BINARY_OBSTACLE_SIMULATION, DEFAULT_LEARNING,
-    SUPER_ENHANCED_LEARNING, SUPER_ENHANCED_BINARY_OBSTACLE_SIMULATION
+    GridPoint, BinaryObstacleState, GridSettings,
+    DEFAULT_LEARNING, DEFAULT_SIMULATION, OBSTACLE_CONFIGS
 )
 from src.simulation import SimulationController
 from src.binary_trainer import BinaryObstacleDroneTrainer
@@ -32,16 +30,7 @@ AWARENESS_COLORS = {
     "neutral": FLOOR_FILL   # Default floor color
 }
 
-# Obstacle configuration options
-OBSTACLE_CONFIGS = {
-    "Default (Random)": DEFAULT_GRID,
-    "Center Cluster": GridSettings(obstacle_zones=OBSTACLE_ZONES_CENTER_CLUSTER, obstacle_count=10),
-    "Right Side Danger": GridSettings(obstacle_zones=OBSTACLE_ZONES_RIGHT_SIDE, obstacle_count=12),
-    "Path Blockers": GridSettings(obstacle_zones=OBSTACLE_ZONES_PATH_BLOCKER, obstacle_count=27),
-    "Sparse Corners": GridSettings(obstacle_zones=OBSTACLE_ZONES_SPARSE_CORNERS, obstacle_count=6),
-    "TOUGH": GridSettings(obstacle_zones=OBSTACLE_ZONES_COOL_NEW, obstacle_count=30)
-
-}
+# Obstacle configs imported from src.config
 
 
 class BinaryObstacleDroneApp(tk.Tk):
@@ -49,31 +38,19 @@ class BinaryObstacleDroneApp(tk.Tk):
 
     def __init__(self) -> None:
         super().__init__()
-        self.title("Binary Obstacle Drone - Enhanced Q-Learning with Obstacle Awareness")
+        self.title("Binary Obstacle Drone - Q-Learning with Obstacle Awareness")
         self.resizable(False, False)
 
-        # Initialize with default configuration and SUPER enhanced learning
-        self.current_config_name = "Default (Random)"
-        self.use_enhanced_params = True  # Start with enhanced parameters for better learning
-        self.use_super_enhanced = True  # START WITH SUPER ENHANCED FOR MAXIMUM LEARNING!
+        # Initialize with first available configuration
+        self.current_config_name = list(OBSTACLE_CONFIGS.keys())[0]
 
-        # Initialize trainer with SUPER enhanced settings for complex navigation
-        if self.use_super_enhanced:
-            learning_settings = SUPER_ENHANCED_LEARNING
-            simulation_settings = SUPER_ENHANCED_BINARY_OBSTACLE_SIMULATION
-        elif self.use_enhanced_params:
-            learning_settings = ENHANCED_LEARNING
-            simulation_settings = ENHANCED_BINARY_OBSTACLE_SIMULATION
-        else:
-            learning_settings = DEFAULT_LEARNING
-            simulation_settings = DEFAULT_BINARY_OBSTACLE_SIMULATION
-
+        # Initialize trainer with optimized settings
         self.trainer = BinaryObstacleDroneTrainer(
             grid_settings=OBSTACLE_CONFIGS[self.current_config_name],
-            learning_settings=learning_settings,
-            simulation_settings=simulation_settings
+            learning_settings=DEFAULT_LEARNING,
+            simulation_settings=DEFAULT_SIMULATION
         )
-        self.controller = SimulationController(self.trainer, settings=simulation_settings)
+        self.controller = SimulationController(self.trainer, settings=DEFAULT_SIMULATION)
         self.snapshot = self.trainer.base_world.make_snapshot()
         self.canvas_width = self.snapshot.cols * CELL_SIZE + 2 * CANVAS_MARGIN
         self.canvas_height = self.snapshot.rows * CELL_SIZE + 2 * CANVAS_MARGIN
@@ -82,8 +59,6 @@ class BinaryObstacleDroneApp(tk.Tk):
         self.drone_count_var = tk.IntVar(value=1)
         self.show_awareness_var = tk.BooleanVar(value=True)
         self.obstacle_config_var = tk.StringVar(value=self.current_config_name)
-        self.enhanced_params_var = tk.BooleanVar(value=self.use_enhanced_params)
-        self.super_enhanced_var = tk.BooleanVar(value=self.use_super_enhanced)
         self.target_row_var = tk.IntVar(value=self.snapshot.goal[0])
         self.target_col_var = tk.IntVar(value=self.snapshot.goal[1])
         self._build_ui()
@@ -129,24 +104,6 @@ class BinaryObstacleDroneApp(tk.Tk):
             command=self._refresh_canvas
         )
         awareness_check.grid(row=3, column=0, sticky="ew", pady=2)
-
-        # Add enhanced parameters toggle
-        enhanced_check = ttk.Checkbutton(
-            controls,
-            text="Enhanced Learning (Complex Nav)",
-            variable=self.enhanced_params_var,
-            command=self._toggle_enhanced_params
-        )
-        enhanced_check.grid(row=4, column=0, sticky="ew", pady=2)
-
-        # Add SUPER enhanced parameters toggle
-        super_enhanced_check = ttk.Checkbutton(
-            controls,
-            text="🚀 SUPER Enhanced (AGGRESSIVE!)",
-            variable=self.super_enhanced_var,
-            command=self._toggle_super_enhanced_params
-        )
-        super_enhanced_check.grid(row=5, column=0, sticky="ew", pady=2)
 
         # Add obstacle configuration selector
         config_frame = ttk.LabelFrame(outer, text="Obstacle Configuration", padding=8)
@@ -332,87 +289,6 @@ class BinaryObstacleDroneApp(tk.Tk):
         self._refresh_canvas()
         self._refresh_stats()
         print(f"Target position updated to ({new_row}, {new_col})")
-
-    def _toggle_enhanced_params(self) -> None:
-        """Toggle between normal and enhanced learning parameters."""
-        self.use_enhanced_params = self.enhanced_params_var.get()
-
-        # Get appropriate settings
-        learning_settings = ENHANCED_LEARNING if self.use_enhanced_params else DEFAULT_LEARNING
-        simulation_settings = ENHANCED_BINARY_OBSTACLE_SIMULATION if self.use_enhanced_params else DEFAULT_BINARY_OBSTACLE_SIMULATION
-
-        # Update trainer with new settings
-        grid_config = OBSTACLE_CONFIGS[self.current_config_name]
-        self.trainer = BinaryObstacleDroneTrainer(
-            grid_settings=grid_config,
-            learning_settings=learning_settings,
-            simulation_settings=simulation_settings
-        )
-
-        # Update controller
-        self.controller.trainer = self.trainer
-        self.controller.settings = simulation_settings
-        self.controller.reset()
-
-        # Update snapshot
-        self.snapshot = self.trainer.base_world.make_snapshot()
-
-        # Refresh display
-        self._refresh_canvas()
-        self._refresh_stats()
-
-        param_type = "Enhanced" if self.use_enhanced_params else "Standard"
-        print(f"Switched to {param_type} learning parameters")
-        if self.use_enhanced_params:
-            print("Enhanced parameters: Higher exploration, longer episodes, reduced penalties for complex navigation!")
-
-    def _toggle_super_enhanced_params(self) -> None:
-        """Toggle SUPER enhanced parameters for MAXIMUM aggressive learning!"""
-        self.use_super_enhanced = self.super_enhanced_var.get()
-
-        # If SUPER enhanced is on, automatically enable enhanced too
-        if self.use_super_enhanced:
-            self.use_enhanced_params = True
-            self.enhanced_params_var.set(True)
-
-        # Get appropriate settings
-        if self.use_super_enhanced:
-            learning_settings = SUPER_ENHANCED_LEARNING
-            simulation_settings = SUPER_ENHANCED_BINARY_OBSTACLE_SIMULATION
-        elif self.use_enhanced_params:
-            learning_settings = ENHANCED_LEARNING
-            simulation_settings = ENHANCED_BINARY_OBSTACLE_SIMULATION
-        else:
-            learning_settings = DEFAULT_LEARNING
-            simulation_settings = DEFAULT_BINARY_OBSTACLE_SIMULATION
-
-        # Update trainer with new settings
-        grid_config = OBSTACLE_CONFIGS[self.current_config_name]
-        self.trainer = BinaryObstacleDroneTrainer(
-            grid_settings=grid_config,
-            learning_settings=learning_settings,
-            simulation_settings=simulation_settings
-        )
-
-        # Update controller
-        self.controller.trainer = self.trainer
-        self.controller.settings = simulation_settings
-        self.controller.reset()
-
-        # Update snapshot
-        self.snapshot = self.trainer.base_world.make_snapshot()
-
-        # Refresh display
-        self._refresh_canvas()
-        self._refresh_stats()
-
-        if self.use_super_enhanced:
-            print("🚀 SUPER ENHANCED MODE ACTIVATED!")
-            print(f"🔥 MAXIMUM exploration (99.9%), MINIMAL penalties, {simulation_settings.max_steps_per_episode} steps per episode!")
-            print("🎯 This drone will explore EVERYTHING and find complex paths!")
-        else:
-            param_type = "Enhanced" if self.use_enhanced_params else "Standard"
-            print(f"Switched to {param_type} learning parameters")
 
     # ------------------------------------------------------------------
     # Enhanced rendering with obstacle awareness
@@ -614,7 +490,7 @@ class BinaryObstacleDroneApp(tk.Tk):
                 )
 
     # ------------------------------------------------------------------
-    # Enhanced stats for binary obstacle drone
+    # Stats display
     # ------------------------------------------------------------------
     def _refresh_stats(self) -> None:
         epsilons = ", ".join(f"{e:.2f}" for e in self.trainer.exploration_rates())
@@ -644,9 +520,9 @@ class BinaryObstacleDroneApp(tk.Tk):
                 recent_avg = sum(recent_10) / len(recent_10)
                 older_avg = sum(older_10) / len(older_10)
                 if recent_avg > older_avg:
-                    trend = "IMPROVING!"
+                    trend = "Improving"
                 elif recent_avg < older_avg:
-                    trend = "Declining..."
+                    trend = "Declining"
                 else:
                     trend = "Stable"
 
@@ -656,44 +532,29 @@ class BinaryObstacleDroneApp(tk.Tk):
         obstacle_info = f"N={current_state[2]}, S={current_state[3]}, W={current_state[4]}, E={current_state[5]}"
 
         # Get obstacle configuration info
-        config_info = f"Config: {self.current_config_name}"
+        config_info = self.current_config_name
         if self.trainer.grid_settings.obstacle_zones:
             zone_count = len(self.trainer.grid_settings.obstacle_zones)
             config_info += f" ({zone_count} zones)"
-        else:
-            config_info += " (full grid)"
-
-        # Enhanced parameters status
-        if self.use_super_enhanced:
-            param_status = "🚀 SUPER ENHANCED MODE (AGGRESSIVE!)"
-            param_status += f" | Max Steps: {self.trainer.simulation_settings.max_steps_per_episode}"
-            param_status += f" | Min Exploration: {self.trainer.learning_settings.min_exploration:.1%}"
-        elif self.use_enhanced_params:
-            param_status = "Enhanced Learning: ON"
-            param_status += f" | Max Steps: {self.trainer.simulation_settings.max_steps_per_episode}"
-        else:
-            param_status = "Enhanced Learning: OFF"
 
         stats = (
-            f"LEARNING PARAMETERS:\n"
-            f"{param_status}\n"
-            f"\nOBSTACLE CONFIGURATION:\n"
-            f"{config_info}\n"
-            f"Total Obstacles: {len(self.snapshot.obstacles)}\n"
-            f"\nLEARNING PROGRESS:\n"
-            f"Episodes: {self.trainer.stats.episodes_completed}\n"
-            f"Steps: {self.trainer.stats.total_steps}\n"
+            f"Configuration: {config_info}\n"
+            f"Obstacles: {len(self.snapshot.obstacles)}\n"
+            f"Grid: {self.snapshot.rows}x{self.snapshot.cols}\n"
+            f"\nTraining Progress:\n"
+            f"Episodes: {self.trainer.stats.episodes_completed}/{self.trainer.simulation_settings.max_episodes}\n"
+            f"Total Steps: {self.trainer.stats.total_steps}\n"
             f"States Learned: {q_table_size}\n"
-            f"\nPERFORMANCE (last 10):\n"
-            f"Success: {success_rate:.1%} | Collision: {collision_rate:.1%}\n"
+            f"\nPerformance (last 10 episodes):\n"
+            f"Success Rate: {success_rate:.1%}\n"
+            f"Collision Rate: {collision_rate:.1%}\n"
             f"Avg Reward: {avg_recent_reward:.1f}\n"
-            f"Avg Length: {avg_recent_length:.1f}\n"
-            f"{trend}\n"
-            f"\nObstacle Awareness: {obstacle_info}\n"
-            f"Exploration: {epsilons}\n"
-            f"Current Reward: {rewards}\n"
-            f"\n2D Grid: {self.snapshot.rows}x{self.snapshot.cols}\n"
-            f"Binary obstacle awareness active!"
+            f"Avg Length: {avg_recent_length:.1f} steps\n"
+            f"Trend: {trend}\n"
+            f"\nCurrent State:\n"
+            f"Obstacle Awareness: {obstacle_info}\n"
+            f"Exploration Rate: {epsilons}\n"
+            f"Last Reward: {rewards}"
         )
         self.stats_var.set(stats)
 

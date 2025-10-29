@@ -8,10 +8,10 @@ from typing import Dict, List
 from .config import (
     DEFAULT_GRID,
     DEFAULT_LEARNING,
-    DEFAULT_BINARY_OBSTACLE_SIMULATION,
+    DEFAULT_SIMULATION,
     GridSettings,
     LearningSettings,
-    BinaryObstacleSimulationSettings,
+    SimulationSettings,
     GridPoint,
 )
 from .drone import BinaryObstacleDrone, share_binary_obstacle_q_tables
@@ -36,7 +36,7 @@ class BinaryObstacleDroneTrainer:
         self,
         grid_settings: GridSettings = DEFAULT_GRID,
         learning_settings: LearningSettings = DEFAULT_LEARNING,
-        simulation_settings: BinaryObstacleSimulationSettings = DEFAULT_BINARY_OBSTACLE_SIMULATION,
+        simulation_settings: SimulationSettings = DEFAULT_SIMULATION,
     ) -> None:
         self.grid_settings = grid_settings
         self.learning_settings = learning_settings
