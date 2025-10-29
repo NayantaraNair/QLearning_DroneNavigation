@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drone Q-Learning System Architecture</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8;
+            color: #334155;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+            flex-direction: column;
+        }
+        .diagram-container {
+            width: 100%;
+            max-width: 1200px;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+            padding: 20px;
+            box-sizing: border-box;
+            overflow: auto;
+        }
+
+        svg {
+            width: 100%;
+            min-width: 900px;
+            height: auto;
+        }
+
+        /* Layer Backgrounds */
+        .layer-ui { fill: #dcfce7; }
+        .layer-control { fill: #e9d5ff; }
+        .layer-training { fill: #dbeafe; }
+        .layer-agent { fill: #bfdbfe; }
+        .layer-environment { fill: #ffedd5; }
+
+        /* Component Styles */
+        .component-core {
+            fill: #ffffff;
+            stroke: #4b5563;
+            stroke-width: 1.5;
+            rx: 8;
+            ry: 8;
+            transition: transform 0.2s ease-in-out, fill 0.2s ease-in-out;
+        }
+        .component-data {
+            fill: #f5f5f5;
+            stroke: #4b5563;
+            stroke-width: 1.5;
+            rx: 0;
+            ry: 0;
+        }
+        .component-core:hover {
+            fill: #e5e7eb;
+            transform: scale(1.02);
+            cursor: pointer;
+        }
+        .component-io {
+            fill: #d1d5db;
+            stroke: #4b5563;
+            stroke-width: 1.5;
+            rx: 8;
+            ry: 8;
+        }
+
+
+        /* Text Styles */
+        .layer-title {
+            font-size: 18px;
+            font-weight: 600;
+            fill: #334155;
+            text-anchor: middle;
+        }
+        .component-title {
+            font-size: 14px;
+            font-weight: 600;
+            fill: #1f2937;
+            text-anchor: middle;
+        }
+        .subheading-text {
+            font-size: 13px;
+            font-weight: 600;
+            fill: #6b7280;
+            text-anchor: middle;
+        }
+        .label-text {
+            font-size: 12px;
+            fill: #4b5563;
+        }
+
+        /* Arrow Styles */
+        .arrow-primary {
+            stroke-width: 3;
+            marker-end: url(#arrowhead-primary);
+        }
+        .arrow-secondary {
+            stroke-width: 1.5;
+            marker-end: url(#arrowhead-secondary);
+        }
+        .arrow-dashed {
+            stroke-width: 1.5;
+            stroke-dasharray: 4 2;
+            marker-end: url(#arrowhead-secondary);
+        }
+        .arrow-dotted {
+            stroke-width: 1.5;
+            stroke-dasharray: 1 3;
+            marker-end: url(#arrowhead-secondary);
+        }
+        .arrow-bidirectional {
+            marker-end: url(#arrowhead-primary);
+            marker-start: url(#arrowhead-primary);
+        }
+        .flow-line {
+            stroke-width: 4;
+            stroke: #4b5563;
+            marker-end: url(#arrowhead-primary);
+        }
+
+
+        /* Legend and Annotations */
+        .legend-box {
+            fill: #f9fafb;
+            stroke: #d1d5db;
+            stroke-width: 1;
+            rx: 6;
+            ry: 6;
+        }
+        .side-panel {
+            fill: #f3f4f6;
+            stroke: #d1d5db;
+            stroke-width: 1;
+        }
+        .side-panel-title {
+            font-size: 14px;
+            font-weight: 600;
+            fill: #1f2937;
+        }
+        .info-box {
+            position: absolute;
+            background: #fff;
+            border: 1px solid #ccc;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s ease-in-out;
+            transform: translateX(-50%);
+            z-index: 10;
+        }
+        .info-box.visible {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+
+<div class="diagram-container">
+    <svg viewBox="0 0 1000 1200" preserveAspectRatio="xMidYMid meet">
+        <!-- Marker Definitions for Arrowheads -->
+        <defs>
+            <marker id="arrowhead-primary" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                <path d="M 0 0 L 10 5 L 0 10 z" fill="#334155" />
+            </marker>
+            <marker id="arrowhead-secondary" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="4" markerHeight="4" orient="auto">
+                <path d="M 0 0 L 10 5 L 0 10 z" fill="#4b5563" />
+            </marker>
+        </defs>
+
+        <!-- Main Workflow Start -->
+        <rect class="component-io" x="400" y="20" width="200" height="50" rx="10" ry="10" />
+        <text class="component-title" x="500" y="50">INPUTS</text>
+        <line class="flow-line" x1="500" y1="70" x2="500" y2="100" />
+        
+        <!-- Diagram Layers -->
+        <g class="layers">
+            <rect class="layer-ui" x="0" y="100" width="1000" height="200" rx="10" ry="10" />
+            <rect class="layer-control" x="0" y="300" width="1000" height="200" rx="10" ry="10" />
+            <rect class="layer-training" x="0" y="500" width="1000" height="200" rx="10" ry="10" />
+            <rect class="layer-agent" x="0" y="700" width="1000" height="200" rx="10" ry="10" />
+            <rect class="layer-environment" x="0" y="900" width="1000" height="200" rx="10" ry="10" />
+        </g>
+        
+        <!-- Layer Titles -->
+        <text class="layer-title" x="500" y="130">USER INTERFACE TIER</text>
+        <text class="layer-title" x="500" y="330">CONTROL & ORCHESTRATION TIER</text>
+        <text class="layer-title" x="500" y="530">TRAINING & LEARNING TIER</text>
+        <text class="layer-title" x="500" y="730">AGENT INTELLIGENCE TIER</text>
+        <text class="layer-title" x="500" y="930">ENVIRONMENT TIER</text>
+
+        <!-- Components - User Interface Tier -->
+        <g class="layer-components" data-layer="UI">
+            <rect class="component-core" x="75" y="160" width="250" height="120" />
+            <text class="component-title" x="200" y="180">Simple Drone GUI</text>
+            <text class="subheading-text" x="200" y="200">Basic Q-Learning Visualization</text>
+            <text class="label-text" x="120" y="225">Canvas</text>
+            <text class="label-text" x="120" y="245">Control Panel</text>
+            <text class="label-text" x="120" y="265">Stats Display</text>
+
+            <rect class="component-core" x="375" y="160" width="250" height="120" />
+            <text class="component-title" x="500" y="180">Binary Obstacle GUI</text>
+            <text class="subheading-text" x="500" y="200">Enhanced Obstacle Awareness</text>
+            <text class="label-text" x="420" y="225">Enhanced Canvas</text>
+            <text class="label-text" x="420" y="245">Awareness Indicators</text>
+            <text class="label-text" x="420" y="265">Advanced Controls</text>
+
+            <rect class="component-core" x="675" y="160" width="250" height="120" />
+            <text class="component-title" x="800" y="180">Performance Comparison Interface</text>
+            <text class="subheading-text" x="800" y="200">Metrics & Analysis</text>
+            <text class="label-text" x="720" y="225">Charts</text>
+            <text class="label-text" x="720" y="245">Reports</text>
+            <text class="label-text" x="720" y="265">Comparison Tools</text>
+        </g>
+        
+        <!-- Components - Control Tier -->
+        <g class="layer-components" data-layer="Control">
+            <rect class="component-core" x="350" y="350" width="300" height="120" />
+            <text class="component-title" x="500" y="370">Simulation Controller</text>
+            <text class="subheading-text" x="500" y="390">Training Orchestration & State Management</text>
+            <text class="label-text" x="400" y="415">Episode Manager</text>
+            <text class="label-text" x="400" y="435">Metrics Collector</text>
+            <text class="label-text" x="400" y="455">Configuration Handler</text>
+
+            <rect class="component-core" x="50" y="370" width="200" height="60" />
+            <text class="component-title" x="150" y="395">Configuration Manager</text>
+            <text class="subheading-text" x="150" y="415">Handles settings & parameters</text>
+            
+            <rect class="component-core" x="750" y="370" width="200" height="60" />
+            <text class="component-title" x="850" y="395">Performance Analyzer</text>
+            <text class="subheading-text" x="850" y="415">Processes training results</text>
+        </g>
+        
+        <!-- Components - Training Tier -->
+        <g class="layer-components" data-layer="Training">
+            <rect class="component-core" x="75" y="550" width="250" height="120" />
+            <text class="component-title" x="200" y="570">Simple Drone Trainer</text>
+            <text class="subheading-text" x="200" y="590">Position-Based Q-Learning</text>
+            <text class="label-text" x="120" y="615">Q-Table (400 states)</text>
+            <text class="label-text" x="120" y="635">Learning Algorithm</text>
+
+            <rect class="component-core" x="375" y="550" width="280" height="120" />
+            <text class="component-title" x="500" y="570">Binary Obstacle Trainer</text>
+            <text class="subheading-text" x="500" y="590">Enhanced State Q-Learning</text>
+            <text class="label-text" x="420" y="615">Q-Table (1351+ states)</text>
+            <text class="label-text" x="420" y="635">Obstacle Detection</text>
+
+            <rect class="component-core" x="675" y="550" width="250" height="120" />
+            <text class="component-title" x="800" y="570">Training Statistics</text>
+            <text class="subheading-text" x="800" y="590">Metrics Collection</text>
+            <text class="label-text" x="720" y="615">Success Rate</text>
+            <text class="label-text" x="720" y="635">Collision Rate</text>
+            <text class="label-text" x="720" y="655">Convergence Data</text>
+        </g>
+        
+        <!-- Components - Agent Tier -->
+        <g class="layer-components" data-layer="Agent">
+            <rect class="component-core" x="150" y="750" width="250" height="120" />
+            <text class="component-title" x="275" y="770">QLearning Drone</text>
+            <text class="subheading-text" x="275" y="790">Simple Agent</text>
+            <text class="label-text" x="200" y="815">State (row, col)</text>
+            <text class="label-text" x="200" y="835">Action Selection</text>
+            <text class="label-text" x="200" y="855">Q-Update</text>
+
+            <rect class="component-core" x="550" y="750" width="250" height="120" />
+            <text class="component-title" x="675" y="770">Binary Obstacle Drone</text>
+            <text class="subheading-text" x="675" y="790">Enhanced Agent</text>
+            <text class="label-text" x="600" y="815">Enhanced State (row, col, obstacles)</text>
+            <text class="label-text" x="600" y="835">Proximity Detection</text>
+            <text class="label-text" x="600" y="855">Advanced Q-Update</text>
+        </g>
+
+        <!-- Components - Environment Tier -->
+        <g class="layer-components" data-layer="Environment">
+            <rect class="component-core" x="200" y="950" width="600" height="120" />
+            <text class="component-title" x="500" y="970">Grid World Environment</text>
+            <text class="label-text" x="250" y="995">Grid Generator: Creates 20x20 layouts</text>
+            <text class="label-text" x="250" y="1015">Obstacle Manager: Handles static obstacles</text>
+            <text class="label-text" x="250" y="1035">Movement Validator: Processes actions</text>
+            <text class="label-text" x="250" y="1055">Reward System: Calculates rewards</text>
+            
+            <rect class="component-data" x="0" y="970" width="150" height="50" />
+            <text class="component-title" x="75" y="995">Configuration Data</text>
+            <rect class="component-data" x="850" y="970" width="150" height="50" />
+            <text class="component-title" x="925" y="995">Action Definitions</text>
+        </g>
+        
+        <!-- Arrows and Data Flow -->
+        <g class="data-flow">
+            <!-- UI to Control -->
+            <line class="arrow-primary" stroke="#10b981" x1="200" y1="280" x2="200" y2="350" />
+            <line class="arrow-primary" stroke="#10b981" x1="500" y1="280" x2="500" y2="350" />
+            <line class="arrow-primary" stroke="#10b981" x1="800" y1="280" x2="800" y2="350" />
+
+            <!-- Control to Training -->
+            <line class="arrow-primary" stroke="#3b82f6" x1="500" y1="470" x2="200" y2="550" />
+            <line class="arrow-primary" stroke="#3b82f6" x1="500" y1="470" x2="500" y2="550" />
+            <line class="arrow-primary" stroke="#3b82f6" x1="500" y1="470" x2="800" y2="550" />
+
+            <!-- Training to Agents -->
+            <line class="arrow-primary" stroke="#3b82f6" x1="200" y1="670" x2="275" y2="750" />
+            <line class="arrow-primary" stroke="#3b82f6" x1="500" y1="670" x2="675" y2="750" />
+
+            <!-- Agents to Environment -->
+            <line class="arrow-primary arrow-bidirectional" stroke="#f97316" x1="275" y1="870" x2="275" y2="950" />
+            <line class="arrow-primary arrow-bidirectional" stroke="#f97316" x1="675" y1="870" x2="675" y2="950" />
+
+            <!-- Secondary flows -->
+            <line class="arrow-secondary" stroke="#8b5cf6" x1="850" y1="430" x2="850" y2="550" />
+            <line class="arrow-secondary" stroke="#8b5cf6" x1="800" y1="550" x2="800" y2="470" />
+
+            <!-- Bidirectional Q-table updates -->
+            <line class="arrow-secondary arrow-bidirectional" x1="275" y1="750" x2="200" y2="670" stroke="#4b5563" />
+            <line class="arrow-secondary arrow-bidirectional" x1="675" y1="750" x2="500" y2="670" stroke="#4b5563" />
+        </g>
+        
+        <!-- Main Workflow End -->
+        <line class="flow-line" x1="500" y1="1070" x2="500" y2="1100" />
+        <rect class="component-io" x="400" y="1100" width="200" height="50" rx="10" ry="10" />
+        <text class="component-title" x="500" y="1130">OUTPUTS</text>
+
+        
+        
+        
+        
+    </svg>
+</div>
+
+</body>
+</html>
