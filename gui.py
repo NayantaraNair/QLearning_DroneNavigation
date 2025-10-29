@@ -5,9 +5,9 @@ import tkinter as tk
 from tkinter import ttk
 from typing import Dict, Iterable, List, Tuple
 
-from config import DEFAULT_SIMULATION, GridPoint
-from simulation import SimulationController
-from trainer import DroneTrainer
+from src.config import DEFAULT_SIMULATION, GridPoint
+from src.simulation import SimulationController
+from src.trainer import DroneTrainer
 
 CELL_SIZE = 25
 CANVAS_MARGIN = 20
@@ -358,3 +358,7 @@ class DroneLearningApp(tk.Tk):
 def launch_gui() -> None:
     app = DroneLearningApp()
     app.mainloop()
+
+
+if __name__ == "__main__":
+    launch_gui()

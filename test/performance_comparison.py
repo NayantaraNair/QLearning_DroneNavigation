@@ -6,9 +6,9 @@ import random
 from typing import List, Dict, Tuple
 import matplotlib.pyplot as plt
 
-from config import DEFAULT_GRID, DEFAULT_LEARNING, DEFAULT_SIMULATION, DEFAULT_BINARY_OBSTACLE_SIMULATION
-from grid import GridWorld
-from drone import QLearningDrone, BinaryObstacleDrone
+from src.config import DEFAULT_GRID, DEFAULT_LEARNING, DEFAULT_SIMULATION, DEFAULT_BINARY_OBSTACLE_SIMULATION
+from src.grid import GridWorld
+from src.drone import QLearningDrone, BinaryObstacleDrone
 
 
 class PerformanceMetrics:

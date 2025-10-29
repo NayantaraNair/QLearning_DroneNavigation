@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Test script to demonstrate the obstacle configuration switcher functionality."""
 
-from config import OBSTACLE_CONFIGS
-from binary_trainer import BinaryObstacleDroneTrainer
+from src.config import OBSTACLE_CONFIGS
+from src.binary_trainer import BinaryObstacleDroneTrainer
 
 def test_all_configurations():
     """Test that all obstacle configurations can be loaded successfully."""

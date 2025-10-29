@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 """Test script for sub-grid obstacle generation."""
 
-from config import (
+from src.config import (
     GridSettings, ObstacleZone,
     OBSTACLE_ZONES_CENTER_CLUSTER,
     OBSTACLE_ZONES_RIGHT_SIDE,
     OBSTACLE_ZONES_PATH_BLOCKER,
     OBSTACLE_ZONES_SPARSE_CORNERS
 )
-from grid import GridWorld
+from src.grid import GridWorld
 
 def print_grid_with_obstacles(world: GridWorld, title: str):
     """Print a visual representation of the grid with obstacles."""

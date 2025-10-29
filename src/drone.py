@@ -5,8 +5,8 @@ import random
 from dataclasses import dataclass, field
 from typing import Dict, List, Sequence, Tuple
 
-from config import DEFAULT_LEARNING, LearningSettings, SimpleState, BinaryObstacleState
-from grid import Action, GridPoint, GridWorld
+from .config import DEFAULT_LEARNING, LearningSettings, SimpleState, BinaryObstacleState
+from .grid import Action, GridPoint, GridWorld
 
 QTable = Dict[SimpleState, List[float]]
 BinaryObstacleQTable = Dict[BinaryObstacleState, List[float]]

@@ -5,7 +5,7 @@ import random
 from dataclasses import dataclass, field
 from typing import Dict, List
 
-from config import (
+from .config import (
     DEFAULT_GRID,
     DEFAULT_LEARNING,
     DEFAULT_SIMULATION,
@@ -13,8 +13,8 @@ from config import (
     LearningSettings,
     SimulationSettings,
 )
-from drone import QLearningDrone, share_q_tables
-from grid import ACTION_VECTORS, GridPoint, GridWorld
+from .drone import QLearningDrone, share_q_tables
+from .grid import ACTION_VECTORS, GridPoint, GridWorld
 
 
 @dataclass

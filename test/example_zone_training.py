@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Example of training drones with custom obstacle zones."""
 
-from config import GridSettings, ObstacleZone, DEFAULT_LEARNING
-from trainer import DroneTrainer
-from binary_trainer import BinaryObstacleDroneTrainer
+from src.config import GridSettings, ObstacleZone, DEFAULT_LEARNING
+from src.trainer import DroneTrainer
+from src.binary_trainer import BinaryObstacleDroneTrainer
 
 def train_with_center_cluster():
     """Train a drone to navigate around center-clustered obstacles."""

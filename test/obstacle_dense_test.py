@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Focused test on obstacle-dense environments where binary drone should excel."""
 
-from grid import GridWorld
-from drone import QLearningDrone, BinaryObstacleDrone
-from config import GridSettings, LearningSettings
+from src.grid import GridWorld
+from src.drone import QLearningDrone, BinaryObstacleDrone
+from src.config import GridSettings, LearningSettings
 
 
 def test_obstacle_density_advantage():

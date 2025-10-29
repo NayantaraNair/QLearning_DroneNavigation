@@ -6,7 +6,7 @@ import random
 from dataclasses import dataclass, field
 from typing import Deque, Dict, FrozenSet, Iterable, Optional, Sequence, Set, Tuple
 
-from config import DEFAULT_GRID, DEFAULT_LEARNING, GridPoint, GridSettings, LearningSettings, ObstacleZone
+from .config import DEFAULT_GRID, DEFAULT_LEARNING, GridPoint, GridSettings, LearningSettings, ObstacleZone
 
 Action = int
 

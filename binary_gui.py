@@ -5,14 +5,14 @@ import tkinter as tk
 from tkinter import ttk
 from typing import Dict, Iterable, List, Tuple
 
-from config import (
+from src.config import (
     DEFAULT_BINARY_OBSTACLE_SIMULATION, DEFAULT_GRID, GridPoint, BinaryObstacleState, GridSettings,
     OBSTACLE_ZONES_CENTER_CLUSTER, OBSTACLE_ZONES_RIGHT_SIDE, OBSTACLE_ZONES_PATH_BLOCKER, OBSTACLE_ZONES_SPARSE_CORNERS, OBSTACLE_ZONES_COOL_NEW,
     ENHANCED_LEARNING, ENHANCED_BINARY_OBSTACLE_SIMULATION, DEFAULT_LEARNING,
     SUPER_ENHANCED_LEARNING, SUPER_ENHANCED_BINARY_OBSTACLE_SIMULATION
 )
-from simulation import SimulationController
-from binary_trainer import BinaryObstacleDroneTrainer
+from src.simulation import SimulationController
+from src.binary_trainer import BinaryObstacleDroneTrainer
 
 CELL_SIZE = 25
 CANVAS_MARGIN = 20

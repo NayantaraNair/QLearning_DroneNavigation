@@ -4,8 +4,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Dict, List
 
-from config import DEFAULT_SIMULATION, SimulationSettings, GridPoint
-from trainer import DroneTrainer
+from .config import DEFAULT_SIMULATION, SimulationSettings, GridPoint
+from .trainer import DroneTrainer
 
 
 @dataclass

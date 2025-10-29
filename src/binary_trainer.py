@@ -5,7 +5,7 @@ import random
 from dataclasses import dataclass, field
 from typing import Dict, List
 
-from config import (
+from .config import (
     DEFAULT_GRID,
     DEFAULT_LEARNING,
     DEFAULT_BINARY_OBSTACLE_SIMULATION,
@@ -14,8 +14,8 @@ from config import (
     BinaryObstacleSimulationSettings,
     GridPoint,
 )
-from drone import BinaryObstacleDrone, share_binary_obstacle_q_tables
-from grid import ACTION_VECTORS, GridPoint, GridWorld
+from .drone import BinaryObstacleDrone, share_binary_obstacle_q_tables
+from .grid import ACTION_VECTORS, GridPoint, GridWorld
 
 
 @dataclass
