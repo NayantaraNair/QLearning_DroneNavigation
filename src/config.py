@@ -94,5 +94,6 @@ OBSTACLE_CONFIGS = {
     "Right Corridor": GridSettings(obstacle_zones=OBSTACLE_ZONES_RIGHT_CORRIDOR, obstacle_count=12),
     "Dual Barriers": GridSettings(obstacle_zones=OBSTACLE_ZONES_DUAL_BARRIERS, obstacle_count=27),
     "Horizontal Bands": GridSettings(obstacle_zones=OBSTACLE_ZONES_HORIZONTAL_BANDS, obstacle_count=15),
-    "Corner Sparse": GridSettings(obstacle_zones=OBSTACLE_ZONES_CORNER_SPARSE, obstacle_count=6)
+    "Corner Sparse": GridSettings(obstacle_zones=OBSTACLE_ZONES_CORNER_SPARSE, obstacle_count=6),
+    "Dense Random (12%)": GridSettings(obstacle_zones=None, obstacle_count=48)  # 48/400 = 12%
 }
